@@ -1,5 +1,6 @@
 import asyncio
 import json
+import sys
 import uuid
 from datetime import date, datetime, timedelta
 
@@ -9,7 +10,7 @@ from mcp.types import Tool, TextContent
 
 from .db import get_pool
 
-server = Server("todo-app")
+server = Server("todo-app", version="1.0.0")
 
 
 # ── Tool definitions ──────────────────────────────────────────────
@@ -462,10 +463,22 @@ async def _get_heatmap(pool) -> list[TextContent]:
 
 # ── Entry point ───────────────────────────────────────────────────
 
-async def main():
-    async with stdio_server() as (read_stream, write_stream):
-        await server.run(read_stream, write_stream, server.create_initialization_options())
+async def _main():
+    print("[todo-mcp] Starting MCP server...", file=sys.stderr, flush=True)
+    try:
+        async with stdio_server() as (read_stream, write_stream):
+            print("[todo-mcp] Connected, waiting for initialization...", file=sys.stderr, flush=True)
+            await server.run(read_stream, write_stream, server.create_initialization_options())
+    except Exception as e:
+        print(f"[todo-mcp] Fatal error: {e}", file=sys.stderr, flush=True)
+        import traceback
+        traceback.print_exc(file=sys.stderr)
+        raise
+
+
+def main():
+    asyncio.run(_main())
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
