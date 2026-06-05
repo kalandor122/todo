@@ -1,0 +1,36 @@
+services:
+  app:
+    build:
+      context: .
+      args:
+        PORT: ${PORT:-3000}
+    ports:
+      - "${PORT:-3000}:${PORT:-3000}"
+    env_file: .env
+    environment:
+      PORT: ${PORT:-3000}
+      DATABASE_URL: postgresql://todo:todo_password@postgres:5432/todo_app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: todo
+      POSTGRES_PASSWORD: todo_password
+      POSTGRES_DB: todo_app
+    ports:
+      - "5435:5432"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U todo -d todo_app"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:
