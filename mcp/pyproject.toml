@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "todo-mcp"
+version = "1.0.0"
+description = "MCP server for the Todo app — manage tasks, categories, tags, and check stats"
+requires-python = ">=3.10"
+dependencies = [
+    "mcp>=1.0.0",
+    "asyncpg>=0.29.0",
+]
+
+[project.scripts]
+todo-mcp = "todo_mcp.server:main"

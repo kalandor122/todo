@@ -7,7 +7,7 @@ from mcp.server import Server
 from mcp.server.stdio import stdio_server
 from mcp.types import Tool, TextContent
 
-from src.db import get_pool
+from .db import get_pool
 
 server = Server("todo-app")
 
@@ -134,7 +134,7 @@ async def list_tools() -> list[Tool]:
 
 # ── Helpers ───────────────────────────────────────────────────────
 
-def _row_to_dict(record: asyncpg.Record) -> dict:
+def _row_to_dict(record) -> dict:
     result = {}
     for key in record.keys():
         val = record[key]
@@ -165,7 +165,7 @@ async def _get_task_subtasks(pool, task_id: str) -> list[dict]:
     return [_row_to_dict(r) for r in rows]
 
 
-async def _enrich_task(pool, task: asyncpg.Record) -> dict:
+async def _enrich_task(pool, task) -> dict:
     task_dict = _row_to_dict(task)
     task_id = str(task["id"])
     task_dict["tags"] = await _get_task_tags(pool, task_id)

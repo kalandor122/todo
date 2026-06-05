@@ -1,5 +1,5 @@
 import asyncpg
-from src.config import DATABASE_URL
+from .config import DATABASE_URL
 
 _pool: asyncpg.Pool | None = None
 
