@@ -11,6 +11,7 @@ export default function Dashboard() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [showForm, setShowForm] = useState(false);
+  const todayStr = new Date().toISOString().split('T')[0];
   const [loading, setLoading] = useState(true);
 
   const fetchData = async () => {
@@ -48,6 +49,8 @@ export default function Dashboard() {
     setShowForm(false);
     fetchData();
   };
+
+  const todayTasks = tasks.filter(t => !t.due_date || t.due_date === todayStr);
 
   if (loading) return <div className="flex justify-center py-20"><div className="w-8 h-8 rounded-full border-2 border-red-600 border-t-transparent animate-spin" /></div>;
 
@@ -92,12 +95,12 @@ export default function Dashboard() {
 
       <div className="space-y-3">
         <h2 className="font-semibold text-gray-700">Tasks</h2>
-        {tasks.length === 0 ? (
+        {todayTasks.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-red-200 bg-white p-8 text-center">
             <p className="text-gray-400">No tasks for today. Add one above!</p>
           </div>
         ) : (
-          tasks.map((task) => (
+          todayTasks.map((task) => (
             <TaskCard key={task.id} task={task} onToggle={handleToggle} onClick={(id) => navigate(`/tasks/${id}`)} />
           ))
         )}
