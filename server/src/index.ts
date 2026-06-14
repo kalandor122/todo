@@ -17,20 +17,19 @@ import { existsSync, readFileSync } from 'fs';
 
 const app = express();
 
-// CORS: restrict to known origins in production
-const allowedOrigins = process.env.CORS_ORIGIN
-  ? process.env.CORS_ORIGIN.split(',').map((s: string) => s.trim())
-  : ['http://localhost:5173', 'http://localhost:3000'];
-app.use(cors({
-  origin: (origin, callback) => {
-    // Allow requests with no origin (e.g. server-to-server, curl, mobile apps)
-    if (!origin || allowedOrigins.includes(origin)) {
+// CORS: allow all by default, restrict via CORS_ORIGIN env var in production
+const corsOptions: cors.CorsOptions = { origin: true }; // reflect request origin
+if (process.env.CORS_ORIGIN) {
+  const allowedOrigins = process.env.CORS_ORIGIN.split(',').map((s: string) => s.trim());
+  corsOptions.origin = (origin: string | undefined, callback: cors.Callback) => {
+    if (!origin || allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
     }
-  },
-}));
+  };
+}
+app.use(cors(corsOptions));
 
 // Body parser with size limit (1MB)
 app.use(express.json({ limit: '1mb' }));
