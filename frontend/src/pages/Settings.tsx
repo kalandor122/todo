@@ -56,7 +56,12 @@ export default function Settings() {
 
   const handleSave = async () => {
     try {
-      await settingsApi.update(form);
+      // Filter out masked placeholder values — never send '••••••••' back to the server
+      // as that would overwrite real secrets with the mask string.
+      const payload = Object.fromEntries(
+        Object.entries(form).filter(([, value]) => value !== '••••••••')
+      );
+      await settingsApi.update(payload);
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     } catch (err) {

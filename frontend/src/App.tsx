@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Routes, Route, NavLink } from 'react-router-dom';
+import ErrorBoundary from './components/ErrorBoundary';
 import Dashboard from './pages/Dashboard';
 import Tasks from './pages/Tasks';
 import TaskDetail from './pages/TaskDetail';
@@ -101,14 +102,16 @@ export default function App() {
       {/* ── Main content ── */}
       <main className="flex-1 min-h-screen">
         <div className="max-w-5xl mx-auto px-4 py-6 pt-16 md:pt-6">
-          <Routes>
+          <ErrorBoundary>
+            <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/tasks" element={<Tasks />} />
             <Route path="/tasks/:id" element={<TaskDetail />} />
             <Route path="/calendar" element={<Calendar />} />
             <Route path="/analytics" element={<Analytics />} />
             <Route path="/settings" element={<Settings />} />
-          </Routes>
+            </Routes>
+          </ErrorBoundary>
         </div>
       </main>
     </div>
