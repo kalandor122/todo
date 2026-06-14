@@ -28,13 +28,17 @@ export default function Calendar() {
   const tasksByDate = useMemo(() => {
     const map: Record<string, { completed: number; pending: number }> = {};
     for (const task of tasks) {
-      if (!task.completed_at && task.status !== 'completed') continue;
-      const dateKey = task.status === 'completed'
-        ? new Date(task.completed_at!).toISOString().split('T')[0]
-        : new Date(task.created_at).toISOString().split('T')[0];
-      if (!map[dateKey]) map[dateKey] = { completed: 0, pending: 0 };
-      if (task.status === 'completed') map[dateKey].completed++;
-      else map[dateKey].pending++;
+      if (task.status === 'completed') {
+        if (!task.completed_at) continue;
+        const dateKey = new Date(task.completed_at!).toISOString().split('T')[0];
+        if (!map[dateKey]) map[dateKey] = { completed: 0, pending: 0 };
+        map[dateKey].completed++;
+      } else {
+        // pending or rolled — group by due_date
+        if (!task.due_date) continue;
+        if (!map[task.due_date]) map[task.due_date] = { completed: 0, pending: 0 };
+        map[task.due_date].pending++;
+      }
     }
     return map;
   }, [tasks]);
@@ -119,8 +123,8 @@ export default function Calendar() {
           <div className="mt-3 space-y-1.5">
             {tasks
               .filter((t) => {
-                const d = t.status === 'completed' ? t.completed_at : t.created_at;
-                return d && d.startsWith(selectedDate);
+                const dateKey = t.status === 'completed' ? t.completed_at : t.due_date;
+                return dateKey && dateKey.startsWith(selectedDate!);
               })
               .slice(0, 10)
               .map((t) => (

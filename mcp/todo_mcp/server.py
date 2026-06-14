@@ -29,6 +29,7 @@ async def list_tools() -> list[Tool]:
                     "category_id": {"type": "string", "description": "UUID of the category to filter by"},
                     "search": {"type": "string", "description": "Case-insensitive search in task title"},
                     "due_date": {"type": "string", "description": "Filter by exact due date (YYYY-MM-DD)"},
+                    "due_today": {"type": "boolean", "description": "Shortcut: filter to tasks due today. Overrides due_date if set."},
                 },
             },
         ),
@@ -277,6 +278,10 @@ async def _list_tasks(pool, args: dict) -> list[TextContent]:
     conditions = ["t.parent_task_id IS NULL"]
     params: list = []
     i = 0
+
+    # due_today shortcut overrides due_date
+    if args.get("due_today"):
+        args["due_date"] = date.today().isoformat()
 
     for field in ["status", "priority", "category_id", "due_date"]:
         val = args.get(field)

@@ -146,6 +146,7 @@ export default function TaskDetail() {
               title: task.title,
               description: task.description,
               priority: task.priority,
+              due_date: task.due_date || undefined,
               category_id: task.category_id || '',
             }}
             categories={categories}

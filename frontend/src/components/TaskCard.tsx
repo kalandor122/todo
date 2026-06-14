@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { cn, priorityColors, priorityLabels } from '../utils';
+import { cn, formatDateShort, isToday, isOverdue, priorityColors, priorityLabels } from '../utils';
 import type { Task } from '../services/api';
 
 interface TaskCardProps {
@@ -63,6 +63,17 @@ export default function TaskCard({ task, onToggle, onClick }: TaskCardProps) {
             <span className={cn('text-xs px-2 py-0.5 rounded-full', priorityColors[task.priority])}>
               {priorityLabels[task.priority]}
             </span>
+
+            {task.due_date && !isToday(task.due_date) && (
+              <span className={cn(
+                'text-xs px-2 py-0.5 rounded-full',
+                isOverdue(task.due_date)
+                  ? 'bg-red-100 text-red-700'
+                  : 'bg-gray-100 text-gray-500'
+              )}>
+                {formatDateShort(task.due_date)}
+              </span>
+            )}
 
             {task.category_name && (
               <span

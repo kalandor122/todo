@@ -1,11 +1,19 @@
 import { useState, useEffect } from 'react';
 import { cn } from '../utils';
 
+function todayString(): string {
+  const d = new Date();
+  return d.getFullYear() + '-' +
+    String(d.getMonth() + 1).padStart(2, '0') + '-' +
+    String(d.getDate()).padStart(2, '0');
+}
+
 interface TaskFormProps {
   onSubmit: (data: {
     title: string;
     description?: string;
     priority: number;
+    due_date?: string;
     category_id?: string;
     tags?: string[];
     parent_task_id?: string | null;
@@ -14,6 +22,7 @@ interface TaskFormProps {
     title: string;
     description?: string;
     priority: number;
+    due_date?: string;
     category_id?: string;
   };
   categories?: { id: string; name: string; color: string }[];
@@ -26,6 +35,7 @@ export default function TaskForm({ onSubmit, initial, categories, tags, parent_t
   const [title, setTitle] = useState(initial?.title || '');
   const [description, setDescription] = useState(initial?.description || '');
   const [priority, setPriority] = useState(initial?.priority || 2);
+  const [dueDate, setDueDate] = useState(initial?.due_date || todayString());
   const [categoryId, setCategoryId] = useState(initial?.category_id || '');
 
   useEffect(() => {
@@ -33,6 +43,7 @@ export default function TaskForm({ onSubmit, initial, categories, tags, parent_t
       setTitle(initial.title);
       setDescription(initial.description || '');
       setPriority(initial.priority);
+      setDueDate(initial.due_date || todayString());
       setCategoryId(initial.category_id || '');
     }
   }, [initial]);
@@ -44,6 +55,7 @@ export default function TaskForm({ onSubmit, initial, categories, tags, parent_t
       title: title.trim(),
       description: description.trim() || undefined,
       priority,
+      due_date: dueDate || undefined,
       category_id: categoryId || undefined,
       parent_task_id,
     });
@@ -51,6 +63,7 @@ export default function TaskForm({ onSubmit, initial, categories, tags, parent_t
       setTitle('');
       setDescription('');
       setPriority(2);
+      setDueDate(todayString());
       setCategoryId('');
     }
   };
@@ -73,6 +86,12 @@ export default function TaskForm({ onSubmit, initial, categories, tags, parent_t
         className="w-full rounded-xl border border-red-200 bg-white px-4 py-2.5 text-sm outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600 transition-colors resize-none"
       />
       <div className="flex items-center gap-3 flex-wrap">
+        <input
+          type="date"
+          value={dueDate}
+          onChange={(e) => setDueDate(e.target.value)}
+          className="rounded-xl border border-red-200 bg-white px-3 py-2 text-sm outline-none focus:border-red-600"
+        />
         <select
           value={priority}
           onChange={(e) => setPriority(Number(e.target.value))}
