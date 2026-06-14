@@ -33,24 +33,37 @@ export default function TaskDetail() {
   useEffect(() => { fetchTask(); }, [id]);
 
   const handleToggle = async (subtaskId: string) => {
-    const subtask = task?.subtasks?.find((t) => t.id === subtaskId);
-    if (!subtask) return;
-    const newStatus = subtask.status === 'completed' ? 'pending' : 'completed';
-    await tasksApi.update(subtaskId, { status: newStatus });
-    fetchTask();
+    try {
+      const subtask = task?.subtasks?.find((t) => t.id === subtaskId);
+      if (!subtask) return;
+      const newStatus = subtask.status === 'completed' ? 'pending' : 'completed';
+      await tasksApi.update(subtaskId, { status: newStatus });
+      fetchTask();
+    } catch (err) {
+      console.error('Failed to toggle subtask:', err);
+    }
   };
 
   const handleUpdate = async (data: any) => {
-    if (!id) return;
-    await tasksApi.update(id, data);
-    setEditing(false);
-    fetchTask();
+    try {
+      if (!id) return;
+      await tasksApi.update(id, data);
+      setEditing(false);
+      fetchTask();
+    } catch (err) {
+      console.error('Failed to update task:', err);
+    }
   };
 
   const handleDelete = async () => {
     if (!id) return;
-    await tasksApi.delete(id);
-    navigate('/tasks');
+    if (!window.confirm('Are you sure you want to delete this task? This cannot be undone.')) return;
+    try {
+      await tasksApi.delete(id);
+      navigate('/tasks');
+    } catch (err) {
+      console.error('Failed to delete task:', err);
+    }
   };
 
   const handleBreakDown = async () => {
@@ -173,8 +186,12 @@ export default function TaskDetail() {
         <h3 className="text-sm font-medium text-gray-600 mb-2">Add Subtask</h3>
         <TaskForm
           onSubmit={async (data: any) => {
-            await tasksApi.create(data);
-            fetchTask();
+            try {
+              await tasksApi.create(data);
+              fetchTask();
+            } catch (err) {
+              console.error('Failed to add subtask:', err);
+            }
           }}
           categories={categories}
           parent_task_id={id}

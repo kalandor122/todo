@@ -46,7 +46,7 @@ export default function TaskForm({ onSubmit, initial, categories, tags, parent_t
       setDueDate(initial.due_date || todayString());
       setCategoryId(initial.category_id || '');
     }
-  }, [initial]);
+  }, [initial?.title, initial?.description, initial?.priority, initial?.due_date, initial?.category_id]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

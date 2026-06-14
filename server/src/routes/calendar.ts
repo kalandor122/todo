@@ -16,7 +16,7 @@ router.get('/oauth/callback', async (req: Request, res: Response) => {
       return;
     }
     await handleCallback(code);
-    res.redirect('http://localhost:5173/settings');
+    res.redirect(process.env.FRONTEND_URL || '/settings');
   } catch (err) {
     console.error('OAuth callback error:', err);
     res.status(500).json({ error: 'OAuth failed' });

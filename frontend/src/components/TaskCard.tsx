@@ -26,6 +26,7 @@ export default function TaskCard({ task, onToggle, onClick }: TaskCardProps) {
       >
         <button
           onClick={(e) => { e.stopPropagation(); onToggle(task.id); }}
+          aria-label={isCompleted ? `Mark "${task.title}" as incomplete` : `Mark "${task.title}" as complete`}
           className={cn(
             'mt-0.5 w-5 h-5 rounded-full border-2 flex-shrink-0 transition-colors',
             isCompleted
@@ -99,6 +100,7 @@ export default function TaskCard({ task, onToggle, onClick }: TaskCardProps) {
         {hasSubtasks && (
           <button
             onClick={(e) => { e.stopPropagation(); setExpanded(!expanded); }}
+            aria-label={expanded ? 'Collapse subtasks' : 'Expand subtasks'}
             className="shrink-0 mt-1 text-gray-400 hover:text-gray-600 transition-colors"
           >
             <svg

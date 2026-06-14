@@ -55,9 +55,13 @@ export default function Settings() {
   }, []);
 
   const handleSave = async () => {
-    await settingsApi.update(form);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    try {
+      await settingsApi.update(form);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch (err) {
+      console.error('Failed to save settings:', err);
+    }
   };
 
   const handleConnectGoogle = () => {
@@ -66,30 +70,46 @@ export default function Settings() {
 
   const handleAddCategory = async () => {
     if (!newCategory.name.trim()) return;
-    await categoriesApi.create(newCategory);
-    setNewCategory({ name: '', color: '#DC2626' });
-    const res = await categoriesApi.list();
-    setCategories(res.data);
+    try {
+      await categoriesApi.create(newCategory);
+      setNewCategory({ name: '', color: '#DC2626' });
+      const res = await categoriesApi.list();
+      setCategories(res.data);
+    } catch (err) {
+      console.error('Failed to add category:', err);
+    }
   };
 
   const handleAddTag = async () => {
     if (!newTag.trim()) return;
-    await tagsApi.create(newTag);
-    setNewTag('');
-    const res = await tagsApi.list();
-    setTags(res.data);
+    try {
+      await tagsApi.create(newTag);
+      setNewTag('');
+      const res = await tagsApi.list();
+      setTags(res.data);
+    } catch (err) {
+      console.error('Failed to add tag:', err);
+    }
   };
 
   const handleDeleteCategory = async (id: string) => {
-    await categoriesApi.delete(id);
-    const res = await categoriesApi.list();
-    setCategories(res.data);
+    try {
+      await categoriesApi.delete(id);
+      const res = await categoriesApi.list();
+      setCategories(res.data);
+    } catch (err) {
+      console.error('Failed to delete category:', err);
+    }
   };
 
   const handleDeleteTag = async (id: string) => {
-    await tagsApi.delete(id);
-    const res = await tagsApi.list();
-    setTags(res.data);
+    try {
+      await tagsApi.delete(id);
+      const res = await tagsApi.list();
+      setTags(res.data);
+    } catch (err) {
+      console.error('Failed to delete tag:', err);
+    }
   };
 
   if (loading) return <div className="flex justify-center py-20"><div className="w-8 h-8 rounded-full border-2 border-red-600 border-t-transparent animate-spin" /></div>;
@@ -100,6 +120,7 @@ export default function Settings() {
 
       <div className="rounded-2xl border border-red-100 bg-white p-4 shadow-sm space-y-3">
         <h2 className="font-semibold">AI Provider</h2>
+        <p className="text-xs text-amber-600">⚠ Sensitive fields are masked. Enter new values only if you need to change them.</p>
         <div>
           <label className="block text-xs text-gray-500 mb-1">MiniMax API Key</label>
           <input
@@ -224,7 +245,7 @@ export default function Settings() {
           {categories.map((c) => (
             <div key={c.id} className="flex items-center gap-1 rounded-full px-3 py-1 text-xs text-white" style={{ backgroundColor: c.color }}>
               {c.name}
-              <button onClick={() => handleDeleteCategory(c.id)} className="ml-1 opacity-70 hover:opacity-100">&times;</button>
+              <button onClick={() => handleDeleteCategory(c.id)} className="ml-1 opacity-70 hover:opacity-100" aria-label={`Delete category ${c.name}`}>&times;</button>
             </div>
           ))}
         </div>
@@ -249,7 +270,7 @@ export default function Settings() {
           {tags.map((t) => (
             <span key={t.id} className="inline-flex items-center gap-1 rounded-full bg-red-50 px-3 py-1 text-xs text-red-700">
               {t.name}
-              <button onClick={() => handleDeleteTag(t.id)} className="ml-1 opacity-70 hover:opacity-100">&times;</button>
+              <button onClick={() => handleDeleteTag(t.id)} className="ml-1 opacity-70 hover:opacity-100" aria-label={`Delete tag ${t.name}`}>&times;</button>
             </span>
           ))}
         </div>

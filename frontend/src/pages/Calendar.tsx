@@ -22,8 +22,19 @@ export default function Calendar() {
   const todayStr = new Date().toISOString().split('T')[0];
 
   useEffect(() => {
-    tasksApi.list({}).then((res) => setTasks(res.data));
-  }, []);
+    const fetchTasks = async () => {
+      try {
+        // Only fetch tasks for the currently displayed month range
+        const start = `${year}-${String(month + 1).padStart(2, '0')}-01`;
+        const end = `${year}-${String(month + 1).padStart(2, '0')}-${String(daysInMonth).padStart(2, '0')}`;
+        const res = await tasksApi.calendar(start, end);
+        setTasks(res.data);
+      } catch (err) {
+        console.error('Failed to fetch calendar tasks:', err);
+      }
+    };
+    fetchTasks();
+  }, [year, month, daysInMonth]);
 
   const tasksByDate = useMemo(() => {
     const map: Record<string, { completed: number; pending: number }> = {};
@@ -45,7 +56,7 @@ export default function Calendar() {
 
   const selectedDayData = selectedDate ? tasksByDate[selectedDate] || { completed: 0, pending: 0 } : null;
 
-  const handlePrev = () => setCurrentDate(new Date(year, month - 1, 1));
+  const handlePrev = () => setCurrentDate(new Date(year, month - 1, 1)); 
   const handleNext = () => setCurrentDate(new Date(year, month + 1, 1));
 
   const daysWithActivity = new Set(Object.keys(tasksByDate));
@@ -56,9 +67,9 @@ export default function Calendar() {
 
       <div className="rounded-2xl border border-red-100 bg-white p-4 shadow-sm">
         <div className="flex items-center justify-between mb-4">
-          <button onClick={handlePrev} className="text-gray-500 hover:text-red-600 text-lg">&larr;</button>
+          <button onClick={handlePrev} className="text-gray-500 hover:text-red-600 text-lg" aria-label="Previous month">&larr;</button>
           <h2 className="text-lg font-semibold">{MONTHS[month]} {year}</h2>
-          <button onClick={handleNext} className="text-gray-500 hover:text-red-600 text-lg">&rarr;</button>
+          <button onClick={handleNext} className="text-gray-500 hover:text-red-600 text-lg" aria-label="Next month">&rarr;</button>
         </div>
 
         <div className="grid grid-cols-7 gap-1">

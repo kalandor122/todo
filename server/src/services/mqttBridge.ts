@@ -90,6 +90,9 @@ async function publishState(deviceId: string) {
   }
 }
 
+// TODO: Wire this up to task route handlers so individual task updates
+// are published to MQTT in real-time, instead of only on command messages.
+// Currently only publishState() is used after MQTT command handling.
 export function publishTaskUpdate(taskId: string, title: string, status: string) {
   if (!client) return;
   const deviceId = env.HA_TODO_DEVICE_ID;

@@ -17,8 +17,27 @@ import { existsSync, readFileSync } from 'fs';
 
 const app = express();
 
-app.use(cors());
-app.use(express.json());
+// CORS: restrict to known origins in production
+const allowedOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(',').map((s: string) => s.trim())
+  : ['http://localhost:5173', 'http://localhost:3000'];
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (e.g. server-to-server, curl, mobile apps)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+}));
+
+// Body parser with size limit (1MB)
+app.use(express.json({ limit: '1mb' }));
+
+// TODO: Add authentication middleware here (e.g., passport, JWT, session-based auth)
+// For now, all endpoints are publicly accessible. This MUST be addressed before production use.
+// Example: app.use('/api', authMiddleware);
 
 const publicPath = join(process.cwd(), 'public');
 if (existsSync(publicPath)) {

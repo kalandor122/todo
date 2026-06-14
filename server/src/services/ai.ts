@@ -46,8 +46,6 @@ export async function breakDownTask(taskId: string): Promise<Subtask[]> {
     response_format: { type: 'json_object' },
     temperature: 0.7,
   });
-  
-  console.log(completion)
   const content = completion.choices[0]?.message?.content;
   if (!content) throw new Error('No response from AI');
 

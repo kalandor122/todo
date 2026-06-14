@@ -18,6 +18,7 @@ async def get_pool() -> asyncpg.Pool:
             )
         except Exception as e:
             print(f"[todo-mcp] Failed to connect to PostgreSQL: {e}", file=sys.stderr)
+            print(f"[todo-mcp] DATABASE_URL={DATABASE_URL}", file=sys.stderr)
             raise
     return _pool
 

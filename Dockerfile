@@ -4,7 +4,7 @@ WORKDIR /app/frontend
 COPY frontend/package.json frontend/tsconfig.json frontend/vite.config.ts frontend/index.html ./
 RUN npm install
 COPY frontend/src ./src
-COPY frontend/public ./public
+# Note: frontend/public directory doesn't exist; removed COPY line
 RUN npm run build
 
 # Build server

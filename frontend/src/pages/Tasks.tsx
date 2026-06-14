@@ -47,18 +47,26 @@ export default function Tasks() {
   useEffect(() => { fetchTasks(); }, [filters]);
 
   const handleToggle = async (id: string) => {
-    const all = tasks.flatMap((t) => [t, ...(t.subtasks || [])]);
-    const task = all.find((t) => t.id === id);
-    if (!task) return;
-    const newStatus = task.status === 'completed' ? 'pending' : 'completed';
-    await tasksApi.update(id, { status: newStatus });
-    fetchTasks();
+    try {
+      const all = tasks.flatMap((t) => [t, ...(t.subtasks || [])]);
+      const task = all.find((t) => t.id === id);
+      if (!task) return;
+      const newStatus = task.status === 'completed' ? 'pending' : 'completed';
+      await tasksApi.update(id, { status: newStatus });
+      fetchTasks();
+    } catch (err) {
+      console.error('Failed to toggle task:', err);
+    }
   };
 
   const handleCreate = async (data: any) => {
-    await tasksApi.create(data);
-    setShowForm(false);
-    fetchTasks();
+    try {
+      await tasksApi.create(data);
+      setShowForm(false);
+      fetchTasks();
+    } catch (err) {
+      console.error('Failed to create task:', err);
+    }
   };
 
   if (loading) return <div className="flex justify-center py-20"><div className="w-8 h-8 rounded-full border-2 border-red-600 border-t-transparent animate-spin" /></div>;

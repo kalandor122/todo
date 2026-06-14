@@ -51,8 +51,17 @@ export interface Stats {
   streak: number;
 }
 
+export interface TaskListParams {
+  status?: string;
+  category_id?: string;
+  tag_id?: string;
+  priority?: number | string;
+  search?: string;
+  due_date?: string;
+}
+
 export const tasksApi = {
-  list: (params?: any) => api.get<Task[]>('/tasks', { params }),
+  list: (params?: TaskListParams) => api.get<Task[]>('/tasks', { params }),
   calendar: (start: string, end: string) => api.get<Task[]>('/tasks/calendar', { params: { start, end } }),
   get: (id: string) => api.get<Task>(`/tasks/${id}`),
   create: (data: Partial<Task>) => api.post<Task>('/tasks', data),
