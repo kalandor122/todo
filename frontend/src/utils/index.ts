@@ -17,18 +17,25 @@ export function formatDateShort(date: string | null): string {
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
+function toLocalDateStr(date: string | Date | null): string | null {
+  if (!date) return null;
+  const d = new Date(date);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
 export function isToday(date: string | null): boolean {
   if (!date) return false;
   const now = new Date();
   const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-  return date === today;
+  return toLocalDateStr(date) === today;
 }
 
 export function isOverdue(date: string | null): boolean {
   if (!date) return false;
   const now = new Date();
   const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-  return date < today;
+  const d = toLocalDateStr(date);
+  return d !== null && d < today;
 }
 
 export const priorityLabels: Record<number, string> = {

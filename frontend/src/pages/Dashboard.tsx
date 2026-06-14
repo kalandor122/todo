@@ -12,7 +12,14 @@ export default function Dashboard() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [showForm, setShowForm] = useState(false);
-  const todayStr = new Date().toISOString().split('T')[0];
+  const todayStr = (() => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); })();
+
+  /** Normalize a due_date (string, Date, or null) to local YYYY-MM-DD */
+  const normalizeDate = (val: any): string | null => {
+    if (!val) return null;
+    const d = new Date(val);
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  };
   const [loading, setLoading] = useState(true);
 
   const fetchData = async () => {
@@ -61,7 +68,10 @@ export default function Dashboard() {
     }
   };
 
-  const todayTasks = tasks.filter(t => !t.due_date || t.due_date === todayStr);
+  const todayTasks = tasks.filter(t => {
+    if (!t.due_date) return true;
+    return normalizeDate(t.due_date) === todayStr;
+  });
 
   if (loading) return <div className="flex justify-center py-20"><div className="w-8 h-8 rounded-full border-2 border-red-600 border-t-transparent animate-spin" /></div>;
 
